@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>PeopleDesk HR — Settings</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 860px;
+        margin: 24px auto;
+        color: #222;
+      }
+      .card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .card h2 {
+        margin-top: 0;
+        font-size: 18px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      #toast {
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        background: #1f4e78;
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 6px;
+        display: none;
+      }
+      #saved-state {
+        background: #f4f4f4;
+        padding: 10px;
+        border-radius: 6px;
+        font-family: monospace;
+      }
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        width: 360px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Settings</h1>
+    <div id="toast"></div>
+
+    <!-- LEVEL 1: two sections, two "Save" buttons -->
+    <div class="card" id="profile-card">
+      <h2>Profile</h2>
+      <label
+        >Display name <input id="display-name" value="Priya Sharma"
+      /></label>
+      <button onclick="saveProfile()">Save</button>
+    </div>
+
+    <div class="card" id="notifications-card">
+      <h2>Notifications</h2>
+      <label
+        ><input type="checkbox" id="weekly-digest" /> Email me the weekly
+        digest</label
+      >
+      <button onclick="saveNotifications()">Save</button>
+    </div>
+
+    <div class="card">
+      <h2>Saved on server</h2>
+      <div id="saved-state">display_name=Priya Sharma; weekly_digest=false</div>
+    </div>
+
+    <!-- LEVEL 2: repeated product cards -->
+    <div class="card">
+      <h2>Add-on plans</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Payroll Plus</h3>
+          <p>AED 49 / month</p>
+          <button onclick="view('Payroll Plus')">View details</button>
+        </div>
+        <div class="card">
+          <h3>Leave Tracker</h3>
+          <p>AED 19 / month</p>
+          <button onclick="view('Leave Tracker')">View details</button>
+        </div>
+        <div class="card">
+          <h3>Expense Claims</h3>
+          <p>AED 29 / month</p>
+          <button onclick="view('Expense Claims')">View details</button>
+        </div>
+      </div>
+      <p id="viewing">Viewing: nothing</p>
+    </div>
+
+    <!-- LEVEL 3: page button vs modal button -->
+    <div class="card">
+      <h2>Danger zone</h2>
+      <button onclick="openModal()">Delete account</button>
+      <button onclick="toast('Changes discarded')">Cancel</button>
+    </div>
+
+    <div class="backdrop" id="backdrop">
+      <div class="modal">
+        <h2>Delete account?</h2>
+        <p>This cannot be undone.</p>
+        <button onclick="closeModal('Deletion cancelled')">Cancel</button>
+        <button onclick="closeModal('Account deleted')">Delete</button>
+      </div>
+    </div>
+
+    <script>
+      const server = { display_name: "Priya Sharma", weekly_digest: false };
+      function render() {
+        document.getElementById(
+          "saved-state"
+        ).textContent = `display_name=${server.display_name}; weekly_digest=${server.weekly_digest}`;
+      }
+      function toast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.display = "block";
+        clearTimeout(t._h);
+        t._h = setTimeout(() => (t.style.display = "none"), 4000);
+      }
+      function saveProfile() {
+        server.display_name = document.getElementById("display-name").value;
+        render();
+        toast("Settings saved");
+      }
+      function saveNotifications() {
+        server.weekly_digest = document.getElementById("weekly-digest").checked;
+        render();
+        toast("Settings saved");
+      }
+      function view(name) {
+        document.getElementById("viewing").textContent = "Viewing: " + name;
+      }
+      function openModal() {
+        document.getElementById("backdrop").style.display = "flex";
+      }
+      function closeModal(msg) {
+        document.getElementById("backdrop").style.display = "none";
+        toast(msg);
+      }
+    </script>
+  </body>
+</html>
